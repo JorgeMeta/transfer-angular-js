@@ -1,0 +1,270 @@
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+body {
+  font-family: "Arial", sans-serif;
+  background: linear-gradient(135deg, #f5f5f5 0%, #e8e8e8 100%);
+  min-height: 100vh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  padding: 20px;
+}
+
+/* CONTAINER PRINCIPAL */
+.main-container {
+  width: 100%;
+  max-width: 420px;
+  margin: 0 auto;
+}
+
+/* CARD ÚNICO */
+.card {
+  background: white;
+  border-radius: 16px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.1);
+  overflow: hidden;
+  padding: 24px;
+}
+
+/* STEPS DENTRO DO CARD */
+.nubank-steps {
+  margin-bottom: 32px;
+  position: relative;
+}
+
+/* BARRA DE PROGRESSO */
+.progress-bg {
+  position: absolute;
+  top: 16px;
+  left: 16px;
+  right: 16px;
+  height: 4px;
+  background: #e0e0e0;
+  border-radius: 4px;
+  z-index: 1;
+}
+
+.progress-bar {
+  height: 100%;
+  background: #820ad1;
+  border-radius: 4px;
+  transition: width 0.4s ease;
+  box-shadow: 0 2px 4px rgba(130, 10, 209, 0.3);
+}
+
+/* CONTAINER DAS BOLINHAS */
+.steps-container {
+  display: flex;
+  justify-content: space-between;
+  position: relative;
+  z-index: 2;
+  padding: 0 8px;
+}
+
+/* BOLINHAS DOS STEPS */
+.step {
+  width: 32px;
+  height: 32px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: bold;
+  font-size: 14px;
+  border: 2px solid #e0e0e0;
+  background: white;
+  color: #757575;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+/* STEP ATIVO */
+.step.active {
+  background: #820ad1;
+  border-color: #820ad1;
+  color: white;
+  transform: scale(1.1);
+  box-shadow: 0 4px 8px rgba(130, 10, 209, 0.3);
+}
+
+/* STEP COMPLETO */
+.step.completed {
+  background: #4caf50;
+  border-color: #4caf50;
+  color: white;
+}
+
+/* STEP FUTURO */
+.step:not(.active):not(.completed):hover {
+  border-color: #820ad1;
+  color: #820ad1;
+}
+
+/* CONTEÚDO */
+.content-wrapper {
+  min-height: 200px;
+  position: relative;
+}
+
+/* ANIMAÇÕES */
+.ng-enter {
+  opacity: 0;
+  transform: translateY(20px);
+}
+
+.ng-enter-active {
+  opacity: 1;
+  transform: translateY(0);
+  transition: all 0.4s cubic-bezier(0.25, 0.46, 0.45, 0.94);
+}
+
+.ng-leave {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+.ng-leave-active {
+  opacity: 0;
+  transform: translateY(-10px);
+  transition: all 0.3s cubic-bezier(0.55, 0.085, 0.68, 0.53);
+}
+
+/* RESPONSIVIDADE */
+@media (max-width: 480px) {
+  .main-container {
+    max-width: 100%;
+    padding: 0 16px;
+  }
+
+  .card {
+    padding: 20px 16px;
+    border-radius: 12px;
+  }
+
+  .steps-container {
+    padding: 0 4px;
+  }
+
+  .step {
+    width: 28px;
+    height: 28px;
+    font-size: 12px;
+  }
+
+  .progress-bg {
+    left: 14px;
+    right: 14px;
+  }
+}
+
+/* FORM STYLES */
+.step-content h2 {
+  color: #333;
+  margin-bottom: 24px;
+  text-align: center;
+}
+
+.form-group {
+  margin-bottom: 16px;
+}
+
+.form-group label {
+  display: block;
+  margin-bottom: 8px;
+  color: #555;
+  font-weight: bold;
+}
+
+.form-input {
+  width: 100%;
+  padding: 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  transition: border-color 0.3s ease;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #820ad1;
+}
+
+/* BUTTONS */
+.btn-primary {
+  width: 100%;
+  padding: 14px;
+  background: #820ad1;
+  color: white;
+  border: none;
+  border-radius: 8px;
+  font-size: 16px;
+  font-weight: bold;
+  cursor: pointer;
+  transition: background 0.3s ease;
+}
+
+.btn-primary:hover {
+  background: #6a08b0;
+}
+
+.btn-secondary {
+  width: 48%;
+  padding: 12px;
+  background: #f5f5f5;
+  color: #333;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 16px;
+  cursor: pointer;
+  margin-right: 4%;
+}
+
+.buttons-group {
+  display: flex;
+  justify-content: space-between;
+  margin-top: 24px;
+}
+
+/* TRANSFER DETAILS */
+.transfer-details {
+  background: #f9f9f9;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+}
+
+.transfer-details p {
+  margin-bottom: 8px;
+  color: #333;
+}
+
+/* RESULT MESSAGE */
+.result-message {
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  text-align: center;
+  font-weight: bold;
+}
+
+.result-message.success {
+  background: #e8f5e8;
+  color: #2e7d32;
+  border: 2px solid #4caf50;
+}
+
+.result-message.error {
+  background: #ffebee;
+  color: #c62828;
+  border: 2px solid #f44336;
+}
+
+.transfer-details p {
+  margin-bottom: 12px; /* Aumentei de 8px para 12px */
+  margin-top: 12px;
+  color: #333;
+}

@@ -1,0 +1,32 @@
+<div class="step-content">
+  <h2>Confirmar Transferência</h2>
+
+  <div class="transfer-details">
+    <h3>Detalhes da Transferência:</h3>
+    <p>
+      <strong>De:</strong> {{formData.fromAccount.name}} -
+      {{formData.fromAccount.number}}
+    </p>
+    <p>
+      <strong>Para:</strong> {{formData.toAccount.name}} -
+      {{formData.toAccount.number}}
+    </p>
+    <p><strong>Valor:</strong> R$ {{formData.amount}}</p>
+    <p><strong>Descrição:</strong> {{formData.description || 'Nenhuma'}}</p>
+    <p><strong>Data:</strong> {{today | date:'dd/MM/yyyy HH:mm'}}</p>
+  </div>
+
+  <div class="buttons-group">
+    <button type="button" class="btn-secondary" ng-click="goBack()">
+      Edit
+    </button>
+    <button
+      type="button"
+      class="btn-primary"
+      ng-click="confirmTransfer()"
+      ng-disabled="loading"
+    >
+      {{loading ? 'Processing...' : 'Confirm Transfer'}}
+    </button>
+  </div>
+</div>

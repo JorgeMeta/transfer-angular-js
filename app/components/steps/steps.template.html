@@ -1,0 +1,18 @@
+<div class="nubank-steps">
+  <div class="progress-bg">
+    <div
+      class="progress-bar"
+      ng-style="{ width: $ctrl.progress() + '%' }"
+    ></div>
+  </div>
+
+  <div class="steps-container">
+    <div
+      class="step"
+      ng-repeat="step in $ctrl.getSteps() track by $index"
+      ng-class="$ctrl.getClass(step)"
+    >
+      {{ step }}
+    </div>
+  </div>
+</div>

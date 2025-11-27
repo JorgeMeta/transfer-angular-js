@@ -1,0 +1,42 @@
+<!DOCTYPE html>
+<html lang="pt-BR" ng-app="bankingApp">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width,initial-scale=1" />
+    <title>Transferência Doméstica</title>
+
+    <link rel="stylesheet" href="styles.css" />
+  </head>
+
+  <body ng-app="bankingApp" ng-controller="AppController">
+    <div class="main-container">
+      <div class="card">
+        <steps-indicator current-step="currentStep" total="3"></steps-indicator>
+
+        <div class="content-wrapper">
+          <div ng-view></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- AngularJS -->
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-route.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/angularjs/1.8.3/angular-animate.min.js"></script>
+
+    <!-- App -->
+    <script src="app.js"></script>
+    <script src="app.routes.js"></script>
+
+    <!-- Controllers -->
+    <script src="controllers/TransferController.js"></script>
+
+    <!-- Services -->
+    <script src="services/TransferService.js"></script>
+    <script src="services/storage.service.js"></script>
+    <script src="services/steps.service.js"></script>
+
+    <!-- Components -->
+    <script src="components/steps/steps.component.js"></script>
+  </body>
+</html>

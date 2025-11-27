@@ -1,0 +1,12 @@
+<div class="step-content">
+  <h2>Resultado</h2>
+
+  <div
+    class="result-message"
+    ng-class="{'success': StorageService.getResultMessage().includes('sucesso')}"
+  >
+    {{ StorageService.getResultMessage() }}
+  </div>
+
+  <button ng-click="goBack()" class="btn-primary">New Transfer</button>
+</div>
