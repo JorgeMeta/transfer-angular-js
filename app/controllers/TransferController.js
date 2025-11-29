@@ -75,5 +75,6 @@ angular
         StorageService.reset();
         $location.path("/transfer/input");
       };
+      console.log("TransferController initialized");
     }
   );
