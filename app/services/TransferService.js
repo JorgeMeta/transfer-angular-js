@@ -3,104 +3,161 @@ angular.module("bankingApp").factory("TransferService", [
   "$timeout",
   "$http",
   function ($q, $timeout, $http) {
-    const API_URL = "http://localhost:3000"; // URL do seu JSON Server
+    const API_URL = "http://localhost:3000";
 
     return {
       getAccounts: function () {
         return $http
           .get(`${API_URL}/accounts`)
-          .then(function (response) {
-            return response.data;
-          })
-          .catch(function (error) {
+          .then((response) => response.data)
+          .catch((error) => {
             console.error("Erro ao buscar contas:", error);
             return $q.reject("Falha ao carregar contas");
           });
       },
 
       validateTransfer: function (transferData) {
-        var deferred = $q.defer();
-
-        // Validações básicas
+        // Validações síncronas - usar $timeout para garantir que o toast seja exibido
         if (!transferData.from || !transferData.to || !transferData.amount) {
-          deferred.reject("Preencha todos os campos obrigatórios");
-          return deferred.promise;
+          return $q(function (resolve, reject) {
+            $timeout(function () {
+              window.__toastComponent.show(
+                "Preencha todos os campos obrigatórios",
+                "error"
+              );
+              reject({
+                success: false,
+                message: "Campos obrigatórios não preenchidos",
+              });
+            });
+          });
         }
 
         if (transferData.from === transferData.to) {
-          deferred.reject("Conta de origem e destino não podem ser iguais");
-          return deferred.promise;
+          return $q(function (resolve, reject) {
+            $timeout(function () {
+              window.__toastComponent.show(
+                "Conta de origem e destino não podem ser iguais",
+                "error"
+              );
+              reject({
+                success: false,
+                message: "Conta de origem e destino iguais",
+              });
+            });
+          });
         }
 
         if (transferData.amount <= 0) {
-          deferred.reject("Valor deve ser maior que zero");
-          return deferred.promise;
+          return $q(function (resolve, reject) {
+            $timeout(function () {
+              window.__toastComponent.show(
+                "O valor deve ser maior que zero",
+                "error"
+              );
+              reject({
+                success: false,
+                message: "Valor inválido",
+              });
+            });
+          });
         }
 
-        // Buscar saldo da conta de origem
-        $http
+        // Validação assíncrona do saldo
+        return $http
           .get(`${API_URL}/accounts/${transferData.from}`)
-          .then(function (response) {
-            var account = response.data;
-            if (account.balance < transferData.amount) {
-              deferred.reject("Saldo insuficiente na conta de origem");
-            } else {
-              deferred.resolve("Transferência válida");
-            }
-          })
-          .catch(function () {
-            deferred.reject("Erro ao validar saldo");
-          });
+          .then((response) => {
+            const account = response.data;
 
-        return deferred.promise;
+            if (account.balance < transferData.amount) {
+              window.__toastComponent.show("Saldo insuficiente", "error");
+              return $q.reject({
+                success: false,
+                message: "Saldo insuficiente",
+              });
+            }
+
+            return { success: true, message: "Validação bem-sucedida" };
+          })
+          .catch(() => {
+            window.__toastComponent.show("Saldo insuficiente", "error");
+            return $q.reject({
+              success: false,
+              message: "Saldo insuficiente",
+            });
+          });
       },
 
       executeTransfer: function (transferData) {
-        var deferred = $q.defer();
+        // Primeiro valida, depois executa
+        return (
+          this.validateTransfer(transferData)
+            .then((validationResult) => {
+              // Se chegou aqui, a validação passou (success: true)
 
-        // Primeiro valida
-        this.validateTransfer(transferData)
-          .then(function () {
-            // Simula processamento
-            $timeout(function () {
-              // Atualiza saldo das contas no JSON Server
-              $http
-                .patch(`${API_URL}/accounts/${transferData.from}`, {
-                  balance:
-                    transferData.fromAccount.balance - transferData.amount,
-                })
-                .then(function () {
-                  return $http.patch(`${API_URL}/accounts/${transferData.to}`, {
-                    balance:
-                      transferData.toAccount.balance + transferData.amount,
-                  });
-                })
-                .then(function () {
-                  // Salva o histórico da transferência
-                  return $http.post(`${API_URL}/transfers`, {
-                    from: transferData.from,
-                    to: transferData.to,
-                    amount: transferData.amount,
-                    description: transferData.description,
-                    date: new Date().toISOString(),
-                    status: "completed",
-                  });
-                })
-                .then(function () {
-                  deferred.resolve("Transferência realizada com sucesso!");
-                })
-                .catch(function (error) {
-                  deferred.reject(
-                    "Erro ao processar transferência: " + error.data
-                  );
-                });
-            }, 1000);
-          })
-          .catch(function (error) {
-            deferred.reject(error);
-          });
+              // Executa a transferência
+              return $timeout(() => {
+                return $http
+                  .get(`${API_URL}/accounts/${transferData.from}`)
+                  .then((response) => {
+                    const fromAccount = response.data;
 
-        return deferred.promise;
+                    // Atualizar conta origem
+                    return $http.patch(
+                      `${API_URL}/accounts/${transferData.from}`,
+                      {
+                        balance: fromAccount.balance - transferData.amount,
+                      }
+                    );
+                  })
+                  .then(() => {
+                    // Atualizar conta destino
+                    return $http
+                      .get(`${API_URL}/accounts/${transferData.to}`)
+                      .then((res) => {
+                        const toAccount = res.data;
+
+                        return $http.patch(
+                          `${API_URL}/accounts/${transferData.to}`,
+                          { balance: toAccount.balance + transferData.amount }
+                        );
+                      });
+                  })
+                  .then(() => {
+                    // Registrar histórico
+                    return $http.post(`${API_URL}/transfers`, {
+                      from: transferData.from,
+                      to: transferData.to,
+                      amount: transferData.amount,
+                      description: transferData.description,
+                      date: new Date().toISOString(),
+                      status: "completed",
+                    });
+                  })
+                  .then(() => {
+                    window.__toastComponent.show(
+                      "Transferência realizada com sucesso!",
+                      "success"
+                    );
+                    return {
+                      success: true,
+                      message: "Transferência realizada com sucesso!",
+                    };
+                  });
+              }, 1000);
+            })
+            // O catch aqui captura apenas erros de rede/timeout da execução
+            .catch((error) => {
+              // Se o erro já tem mensagem (vindo da validação), não mostra toast duplicado
+              if (!error.message) {
+                window.__toastComponent.show(
+                  "Erro ao processar transferência",
+                  "error"
+                );
+              }
+              return $q.reject(error);
+            })
+        );
       },
     };
   },

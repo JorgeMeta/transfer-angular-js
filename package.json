@@ -19,5 +19,8 @@
   "homepage": "https://github.com/JorgeMeta/transfer-angular-js#readme",
   "devDependencies": {
     "json-server": "^1.0.0-beta.3"
+  },
+  "dependencies": {
+    "toastr": "^2.1.4"
   }
 }
