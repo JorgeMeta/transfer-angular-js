@@ -83,6 +83,10 @@ angular
       };
 
       $scope.goBack = function () {
+        $location.path("/transfer/input");
+      };
+
+      $scope.newTransfer = function () {
         StorageService.reset();
         $location.path("/transfer/input");
       };
