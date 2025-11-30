@@ -8,7 +8,7 @@
         id="fromAccount"
         class="form-input"
         ng-model="formData.from"
-        ng-options="account.id as (account.name + ' - ' + account.number + ' (Saldo: R$ ' + account.balance + ')') for account in accounts"
+        ng-options="account.id as (account.name + ' - ****' + account.number + ' (Saldo: R$ ' + (account.balance | number:2) + ')') for account in accounts"
         required
       >
         <option value="" disabled selected>Selecione a conta de origem</option>
