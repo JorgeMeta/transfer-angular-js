@@ -3,9 +3,12 @@
 
   <div
     class="result-message"
-    ng-class="{'success': StorageService.getResultMessage().includes('sucesso')}"
+    ng-class="{
+    'success': !isSuccess,
+    'error':   isSuccess
+ }"
   >
-    {{ StorageService.getResultMessage() }}
+    {{ message }}
   </div>
 
   <button ng-click="newTransfer()" class="btn-primary">New Transfer</button>

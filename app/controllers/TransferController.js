@@ -12,18 +12,21 @@ angular
       $scope.currentStep = StepsService.getCurrentStep();
       $scope.StorageService = StorageService;
       $scope.formData = StorageService.getFormData();
-
       $scope.accounts = [];
       $scope.loading = false;
-
+      $scope.message = StorageService.getResultMessage();
+      $scope.isSuccess = StorageService.isSuccess;
       $scope.today = new Date();
+
+      $scope.$on("$routeChangeSuccess", function () {
+        const step = StepsService.updateStepFromRoute($location.path());
+        if (step) {
+          $scope.currentStep = step;
+        }
+      });
 
       TransferService.getAccounts().then(function (accounts) {
         $scope.accounts = accounts;
-      });
-
-      $scope.$on("$routeChangeSuccess", function () {
-        StepsService.updateStepFromRoute($location.path());
       });
 
       $scope.$on("stepChanged", function (event, newStep) {
@@ -31,13 +34,8 @@ angular
       });
 
       $scope.goToVerify = function () {
-        console.log("goToVerify FOI CHAMADO!"); // ← VERIFIQUE SE ESTÁ APARECENDO
-        console.log("Dados do formData:", $scope.formData); // ← VEJA OS DADOS
-
         $scope.loading = true;
-        $scope.today = new Date();
 
-        // Só busca as contas se os IDs existirem
         if ($scope.formData.from) {
           $scope.formData.fromAccount = $scope.accounts.find(
             (acc) => acc.id === $scope.formData.from
@@ -50,45 +48,35 @@ angular
           );
         }
 
-        console.log("Dados após buscar contas:", $scope.formData); // ← VEJA OS DADOS APÓS
-
         TransferService.validateTransfer($scope.formData)
-          .then(function (result) {
+          .then(function () {
             StorageService.setFormData($scope.formData);
             $location.path("/transfer/verify");
           })
-          .catch(function (error) {
-            console.log("Erro na validação:", error); // ← VEJA SE HÁ ERRO
-          })
-          .finally(function () {
-            $scope.loading = false;
-          });
+          .finally(() => ($scope.loading = false));
       };
 
       $scope.confirmTransfer = function () {
         $scope.loading = true;
 
         TransferService.executeTransfer($scope.formData)
-          .then(function (successMsg) {
-            StorageService.setResultMessage(successMsg);
+          .then(function (response) {
+            StorageService.setResultMessage(response.message, true);
+            $scope.message = response.message;
+            $scope.isSuccess = true;
             $location.path("/transfer/result");
           })
-          .catch(function (errorMsg) {
-            StorageService.setResultMessage(errorMsg, true);
+          .catch(function (err) {
+            const msg =
+              typeof err === "string" ? err : err.message || "Erro inesperado";
+            StorageService.setResultMessage(msg, false);
+            $scope.message = msg;
+            $scope.isSuccess = false;
             $location.path("/transfer/result");
           })
-          .finally(function () {
-            $scope.loading = false;
-          });
+          .finally(() => ($scope.loading = false));
       };
 
-      $scope.goBack = function () {
-        $location.path("/transfer/input");
-      };
-
-      $scope.newTransfer = function () {
-        StorageService.reset();
-        $location.path("/transfer/input");
-      };
+      $scope.goBack = () => $location.path("/transfer/input");
     }
   );

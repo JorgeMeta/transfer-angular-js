@@ -17,7 +17,6 @@ angular.module("bankingApp").factory("TransferService", [
       },
 
       validateTransfer: function (transferData) {
-        // Validações síncronas - usar $timeout para garantir que o toast seja exibido
         if (!transferData.from || !transferData.to || !transferData.amount) {
           return $q(function (resolve, reject) {
             $timeout(function () {
@@ -63,7 +62,6 @@ angular.module("bankingApp").factory("TransferService", [
           });
         }
 
-        // Validação assíncrona do saldo
         return $http
           .get(`${API_URL}/accounts/${transferData.from}`)
           .then((response) => {
@@ -89,75 +87,65 @@ angular.module("bankingApp").factory("TransferService", [
       },
 
       executeTransfer: function (transferData) {
-        // Primeiro valida, depois executa
-        return (
-          this.validateTransfer(transferData)
-            .then((validationResult) => {
-              // Se chegou aqui, a validação passou (success: true)
+        return this.validateTransfer(transferData)
+          .then((validationResult) => {
+            return $timeout(() => {
+              return $http
+                .get(`${API_URL}/accounts/${transferData.from}`)
+                .then((response) => {
+                  const fromAccount = response.data;
 
-              // Executa a transferência
-              return $timeout(() => {
-                return $http
-                  .get(`${API_URL}/accounts/${transferData.from}`)
-                  .then((response) => {
-                    const fromAccount = response.data;
+                  return $http.patch(
+                    `${API_URL}/accounts/${transferData.from}`,
+                    {
+                      balance: fromAccount.balance - transferData.amount,
+                    }
+                  );
+                })
+                .then(() => {
+                  return $http
+                    .get(`${API_URL}/accounts/${transferData.to}`)
+                    .then((res) => {
+                      const toAccount = res.data;
 
-                    // Atualizar conta origem
-                    return $http.patch(
-                      `${API_URL}/accounts/${transferData.from}`,
-                      {
-                        balance: fromAccount.balance - transferData.amount,
-                      }
-                    );
-                  })
-                  .then(() => {
-                    // Atualizar conta destino
-                    return $http
-                      .get(`${API_URL}/accounts/${transferData.to}`)
-                      .then((res) => {
-                        const toAccount = res.data;
-
-                        return $http.patch(
-                          `${API_URL}/accounts/${transferData.to}`,
-                          { balance: toAccount.balance + transferData.amount }
-                        );
-                      });
-                  })
-                  .then(() => {
-                    // Registrar histórico
-                    return $http.post(`${API_URL}/transfers`, {
-                      from: transferData.from,
-                      to: transferData.to,
-                      amount: transferData.amount,
-                      description: transferData.description,
-                      date: new Date().toISOString(),
-                      status: "completed",
+                      return $http.patch(
+                        `${API_URL}/accounts/${transferData.to}`,
+                        { balance: toAccount.balance + transferData.amount }
+                      );
                     });
-                  })
-                  .then(() => {
-                    window.__toastComponent.show(
-                      "Transferência realizada com sucesso!",
-                      "success"
-                    );
-                    return {
-                      success: true,
-                      message: "Transferência realizada com sucesso!",
-                    };
+                })
+                .then(() => {
+                  return $http.post(`${API_URL}/transfers`, {
+                    from: transferData.from,
+                    to: transferData.to,
+                    amount: transferData.amount,
+                    description: transferData.description,
+                    date: new Date().toISOString(),
+                    status: "completed",
                   });
-              }, 1000);
-            })
-            // O catch aqui captura apenas erros de rede/timeout da execução
-            .catch((error) => {
-              // Se o erro já tem mensagem (vindo da validação), não mostra toast duplicado
-              if (!error.message) {
-                window.__toastComponent.show(
-                  "Erro ao processar transferência",
-                  "error"
-                );
-              }
-              return $q.reject(error);
-            })
-        );
+                })
+                .then(() => {
+                  window.__toastComponent.show(
+                    "Transferência realizada com sucesso!",
+                    "success"
+                  );
+                  return {
+                    success: true,
+                    message: "Transferência realizada com sucesso!",
+                  };
+                });
+            }, 1000);
+          })
+
+          .catch((error) => {
+            if (!error.message) {
+              window.__toastComponent.show(
+                "Erro ao processar transferência",
+                "error"
+              );
+            }
+            return $q.reject(error);
+          });
       },
     };
   },

@@ -16,13 +16,11 @@ angular.module("bankingApp").component("appToast", {
       ctrl.type = type;
       ctrl.visible = true;
 
-      // some depois de 3s
       $timeout(function () {
         ctrl.visible = false;
       }, 3000);
     };
 
-    // expõe globalmente
     window.__toastComponent = ctrl;
   },
 });

@@ -12,7 +12,7 @@ angular.module("bankingApp").config([
       })
       .when("/transfer/result", {
         templateUrl: "views/transfer-result.html",
-        controller: "TransferController",
+        controller: "ResultController",
       })
       .otherwise({
         redirectTo: "/transfer/input",
