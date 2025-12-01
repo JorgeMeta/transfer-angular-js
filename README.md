@@ -80,16 +80,32 @@ transfer-angular-js/
 │
 ├─ index.html                # Main layout and global container
 ├─ app/
+│   ├─ components/
+│   │   ├─ steps/
+│   │   │   ├─ steps.component.js
+│   │   │   └─ steps.template.html
+│   │   └─ toast/
+│   │       ├─ toast.component.js
+│   │       └─ toast.css
 │   ├─ controllers/
-│   │   ├─ TransferController.js
-│   │   └─ ResultController.js
+│   │   ├─ ResultController.js
+│   │   └─ TransferController.js
+│   ├─ directives/
+│   │   └─ currencyMask.directive.js
 │   ├─ services/
-│   │   ├─ StorageService.js
-│   │   └─ StepsService.js
-│   ├─ config/
-│   │   └─ routes.js
-│   └─ styles/
-│       └─ main.css
+│   │   ├─ steps.service.js
+│   │   ├─ storage.service.js
+│   │   ├─ toast.service.js
+│   │   └─ TransferService.js
+│   └─ views/
+│       ├─ transfer-input.html
+│       ├─ transfer-result.html
+│       └─ transfer-verify.html
+├─ app.js
+├─ app.routes.js
+├─ styles.css
 ├─ db.json                   # Mock data for JSON Server
+├─ package.json
+├─ package-lock.json
 └─ README.md
 ```
