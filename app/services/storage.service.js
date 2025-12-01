@@ -72,11 +72,6 @@ angular.module("bankingApp").factory("StorageService", function ($window) {
     },
 
     reset: () => {
-      console.log(
-        "[StorageService] reset called (was) ->",
-        data.resultMessage,
-        data.isSuccess
-      );
       data.formData.from = null;
       data.formData.to = null;
       data.formData.amount = null;
